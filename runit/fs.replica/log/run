@@ -1,0 +1,18 @@
+#!/bin/sh
+
+exec 2>&1
+
+USER='www'
+LOG_DIR="/var/log/filestorage/replica"
+LOG_SIZE=16777215
+LOG_NUMBER=64
+
+DROPROOT="chpst -u ${USER}"
+LOGGER="svlogd -tt"
+
+[ -d ${LOG_DIR} ] || mkdir -p ${LOG_DIR} || exit
+chmod 700 ${LOG_DIR} || exit
+chown -R ${USER} ${LOG_DIR} || exit
+echo -e "s${LOG_SIZE}\nn${LOG_NUMBER}" > ${LOG_DIR}/config
+
+exec ${DROPROOT} ${LOGGER} ${LOG_DIR}

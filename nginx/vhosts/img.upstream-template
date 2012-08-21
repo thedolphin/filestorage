@@ -1,0 +1,3 @@
+upstream img-mirror {
+    server imgtest2.lan;
+}

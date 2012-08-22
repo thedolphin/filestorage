@@ -50,6 +50,10 @@
                         } else {
                             throw new Exception("Query error:" . mysql_error());
                         }
+
+                        if ($cache && ($config['memcache']['cacheall'] == 'yes' || $dup)) {
+                            $mc->set("$hash:$size:$groupindex", array('uuid-text' => $uuid, 'ext' => $ext));
+                        }
                     }
 
                     if(!mysql_query("INSERT IGNORE INTO files(`uuid`,`uuid-text`,`date`, `hash`, `size`, `ext`, `group`) VALUES (UNHEX(REPLACE('". $uuid ."', '-', '')), '". $uuid ."', FROM_UNIXTIME(" .$time. "), UNHEX('" .$hash."'), " .$size. ", '" .$ext. "', " .$groupindex. ")"))
@@ -64,10 +68,6 @@
                         $dst = substr($row['uuid-text'], 32, 2) .'/'. substr($row['uuid-text'], 30, 2) .'/'. $row['uuid-text'] .'.'. $row['ext'];
                         if ($source != $dst) {
                             mq_send_to_group(serialize(array('Action' => 'dedup', 'Time' => time(), 'Files' => array($source, $dst))), $groupindex);
-                        }
-                    } else {
-                        if ($cache) {
-                            $mc->set("$hash:$size:$groupindex", array('uuid-text' => $uuid, 'ext' => $ext));
                         }
                     }
                 }

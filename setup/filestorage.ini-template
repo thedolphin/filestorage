@@ -26,3 +26,8 @@ user=fsuser
 pass=fspass
 host=imgtest2.lan
 db=filestorage
+
+[memcache]
+host=127.0.0.1
+port=11211
+cacheall=yes

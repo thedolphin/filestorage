@@ -5,6 +5,12 @@
 
     $result = array('Status' => array('OK' => 0));
 
+    if (!empty($_SERVER['HTTP_X_REAL_IP'])) {
+        $client = $_SERVER['HTTP_X_REAL_IP'];
+    } else {
+        $client = $_SERVER['REMOTE_ADDR'];
+    }
+
     try {
 
         mq_init();
@@ -33,7 +39,7 @@
                 $targetfile = $targetdir .'/'. $filename;
 
                 $filedata['Source'] = $path .'/'. $filename;
-                if (!mq_broadcast(serialize(array('Action' => 'delete', 'Time' => time(), 'Data' => $filedata))))
+                if (!mq_broadcast(serialize(array('Action' => 'delete', 'Time' => time(), 'ClientIP' => $client, 'Data' => $filedata))))
                         throw new Exception('AMQPExchange::publish returned FALSE');
 
                 $result['Status']['OK']++;

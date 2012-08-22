@@ -5,6 +5,12 @@
 
     $result = array('Status' => array('OK' => 0));
 
+    if (!empty($_SERVER['HTTP_X_REAL_IP'])) {
+        $client = $_SERVER['HTTP_X_REAL_IP'];
+    } else {
+        $client = $_SERVER['REMOTE_ADDR'];
+    }
+
     try {
 
         mq_init();
@@ -68,6 +74,7 @@
                                             'Time' => time(),
                                             'Prefix' => $config['node']['hostprefix'],
                                             'GroupIndex' => $config['group']['index'],
+                                            'ClientIP' => $client,
                                             'Data' => $filedata))))
 
                         throw new Exception('AMQPExchange::publish returned FALSE');

@@ -29,6 +29,7 @@
             $hash   = $data['Data']['Hash'];      unset($data['Data']['Hash']);
             $size   = $data['Data']['Size'];      unset($data['Data']['Size']);
             $ext    = $data['Data']['Extension']; unset($data['Data']['Extension']);
+            $client = $data['Data']['ClientIP'];  unset($data['Data']['ClientIP']);
 
             $groupindex = $data['GroupIndex'];
             $time = $data['Time'];
@@ -71,7 +72,7 @@
                     if($dup) {
                         $dst = substr($dup['uuid-text'], 32, 2) .'/'. substr($dup['uuid-text'], 30, 2) .'/'. $dup['uuid-text'] .'.'. $dup['ext'];
                         if ($source != $dst) {
-                            mq_send_to_group(serialize(array('Action' => 'dedup', 'Time' => time(), 'Files' => array($source, $dst))), $groupindex);
+                            mq_send_to_group(serialize(array('Action' => 'dedup', 'Time' => time(), 'ClientIP' => $client, 'Files' => array($source, $dst))), $groupindex);
                         }
                     }
                 }

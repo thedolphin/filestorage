@@ -20,9 +20,9 @@
                 curl_setopt($ch, CURLOPT_HEADER, 0);
                 curl_exec($ch);
                 $err = curl_errno($ch);
+                if ($err) throw new Exception('cURL error: ' . curl_error($ch));
                 curl_close($ch);
                 fclose($fp);
-                if ($err) throw new Exception(curl_error());
             }
 
             if ($data['Action'] == 'delete') {

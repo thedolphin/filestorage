@@ -50,7 +50,7 @@ function mq_broadcast($message) {
 function mq_send_to_group($message, $groupindex) {
 
     global $amqp_pub;
-    return $amqp_pub->publish($message, '', 0, array('headers' => array('group' . $groupindex => 'yes')));
+    return $amqp_pub->publish($message, '', 0, array('headers' => array('group' . $groupindex => 'yes', 'log' => 'yes')));
 }
 
 function mq_send_to_slaves($message) {
@@ -58,5 +58,5 @@ function mq_send_to_slaves($message) {
     global $amqp_pub;
     global $config;
 
-    return $amqp_pub->publish($message, '', 0, array('headers' => array($config['node']['hostname'] => 'yes', 'log' => 'yes' )));
+    return $amqp_pub->publish($message, '', 0, array('headers' => array($config['node']['hostname'] => 'yes', 'log' => 'yes', 'db' => 'yes' )));
 }

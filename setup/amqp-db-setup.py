@@ -34,6 +34,6 @@ channel.queue_declare(queue = queuename, durable = True, arguments = queue_args)
 bind_args = dict()
 bind_args['x-match'] = 'any'
 bind_args['broadcast'] = 'yes'
-bind_args['log'] = 'yes'
+bind_args['db'] = 'yes'
 
 channel.queue_bind(queue = queuename, exchange = 'filestorage', arguments = bind_args)

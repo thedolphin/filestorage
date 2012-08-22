@@ -29,8 +29,8 @@
             $hash   = $data['Data']['Hash'];      unset($data['Data']['Hash']);
             $size   = $data['Data']['Size'];      unset($data['Data']['Size']);
             $ext    = $data['Data']['Extension']; unset($data['Data']['Extension']);
-            $client = $data['Data']['ClientIP'];  unset($data['Data']['ClientIP']);
 
+            $client = $data['ClientIP'];
             $groupindex = $data['GroupIndex'];
             $time = $data['Time'];
 

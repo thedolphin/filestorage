@@ -17,21 +17,21 @@
             if($data['Action'] == 'copy') {
                 file_put_contents(
                     $config['log']['commit'],
-                    $date . ' [' . $time . '] ' . $data['Data']['ClientIP'] .' '. $data['Action'] .' '. $data['Data']['UUID'] .'.'. $data['Data']['Extension'] .' '. $data['Data']['Size'] .' '. $data['Data']['Hash'] ."\n",
+                    $date . ' [' . $time . '] ' . $data['ClientIP'] .' '. $data['Action'] .' '. $data['Data']['UUID'] .'.'. $data['Data']['Extension'] .' '. $data['Data']['Size'] .' '. $data['Data']['Hash'] ."\n",
                     FILE_APPEND | LOCK_EX );
             }
 
             if($data['Action'] == 'delete') {
                 file_put_contents(
                     $config['log']['commit'],
-                    $date . ' [' . $time . '] ' . $data['Data']['ClientIP'] .' '. $data['Action'] .' '. $data['Data']['UUID'] .'.'. $data['Data']['Extension'] ."\n",
+                    $date . ' [' . $time . '] ' . $data['ClientIP'] .' '. $data['Action'] .' '. $data['Data']['UUID'] .'.'. $data['Data']['Extension'] ."\n",
                     FILE_APPEND | LOCK_EX );
             }
 
             if($data['Action'] == 'dedup') {
                 file_put_contents(
                     $config['log']['commit'],
-                    $date . ' [' . $time . '] ' . $data['Data']['ClientIP'] .' '. $data['Action'] .' '. $data['Files'][0] .' => '. $data['Files'][1] ."\n",
+                    $date . ' [' . $time . '] ' . $data['ClientIP'] .' '. $data['Action'] .' '. $data['Files'][0] .' => '. $data['Files'][1] ."\n",
                     FILE_APPEND | LOCK_EX );
             }
 

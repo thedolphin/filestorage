@@ -14,10 +14,27 @@
             $time = $data['Time'];
             $date = date('Y-m-d H:i:s', $time);
 
-            file_put_contents(
+            if($data['Action'] == 'copy') {
+                file_put_contents(
                     $config['log']['commit'],
                     $date . ' [' . $time . '] ' . $data['Action'] .' '. $data['Data']['UUID'] .'.'. $data['Data']['Extension'] .' '. $data['Data']['Size'] .' '. $data['Data']['Hash'] ."\n",
                     FILE_APPEND | LOCK_EX );
+            }
+
+            if($data['Action'] == 'delete') {
+                file_put_contents(
+                    $config['log']['commit'],
+                    $date . ' [' . $time . '] ' . $data['Action'] .' '. $data['Data']['UUID'] .'.'. $data['Data']['Extension'] ."\n",
+                    FILE_APPEND | LOCK_EX );
+            }
+
+            if($data['Action'] == 'dedup') {
+                file_put_contents(
+                    $config['log']['commit'],
+                    $date . ' [' . $time . '] ' . $data['Action'] .' '. $data['Files'][0] .' => '. $data['Files'][1] ."\n",
+                    FILE_APPEND | LOCK_EX );
+            }
+
 
             $amqp_sub->ack($message->getDeliveryTag());
         }

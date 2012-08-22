@@ -27,7 +27,7 @@ elif mirror != 'none':
     queue_args['x-ha-policy'] = 'nodes'
     queue_args['x-ha-policy-params'] = mirror.split(',');
 
-queuename = 'filestorage.logwriter'
+queuename = 'filestorage.dbwriter'
 
 channel.queue_declare(queue = queuename, durable = True, arguments = queue_args)
 

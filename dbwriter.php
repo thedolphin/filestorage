@@ -13,8 +13,12 @@
         $amqp_sub = new AMQPQueue(new AMQPChannel($amqp_conn));
         $amqp_sub->SetName('filestorage.dbwriter');
 
-        $mc = new Memcache;
-        $cache = $mc->connect($config['memcache']['host'], $config['memcache']['port']);
+        if($config['memcache']['enable'] == 'yes') {
+            $mc = new Memcache;
+            $cache = $mc->connect($config['memcache']['host'], $config['memcache']['port']);
+        } else {
+            $cache = FALSE;
+        }
 
         while($message = $amqp_sub->get()) {
 
@@ -65,7 +69,7 @@
                     }
 
                     if($dup) {
-                        $dst = substr($row['uuid-text'], 32, 2) .'/'. substr($row['uuid-text'], 30, 2) .'/'. $row['uuid-text'] .'.'. $row['ext'];
+                        $dst = substr($dup['uuid-text'], 32, 2) .'/'. substr($dup['uuid-text'], 30, 2) .'/'. $dup['uuid-text'] .'.'. $dup['ext'];
                         if ($source != $dst) {
                             mq_send_to_group(serialize(array('Action' => 'dedup', 'Time' => time(), 'Files' => array($source, $dst))), $groupindex);
                         }

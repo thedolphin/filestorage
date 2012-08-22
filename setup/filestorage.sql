@@ -9,7 +9,7 @@ CREATE TABLE `files` (
   `deleted` boolean NOT NULL DEFAULT FALSE COMMENT 'We will never delete records, just mark as deleted',
   `linked` boolean NOT NULL DEFAULT FALSE COMMENT 'True, if there is corresponding valid records in main database',
   PRIMARY KEY (`uuid`),
-  KEY (`uuid`, `hash`, `size`, `group`, `deleted`)
+  KEY (`hash`, `size`, `group`, `deleted`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 

@@ -3,7 +3,7 @@
 exec 2>&1
 
 USER='www'
-LOG_DIR="/var/log/filestorage/replica"
+LOG_DIR='/var/log/filestorage/'$(basename ${PWD%/log})
 LOG_SIZE=16777215
 LOG_NUMBER=64
 

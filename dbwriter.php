@@ -48,7 +48,7 @@
                     }
 
                     if (!$dup) {
-                        if($res = mysql_query("SELECT `uuid-text`, `ext` FROM files WHERE `hash` = UNHEX('" .$hash. "') AND `size` = " .$size. " AND `group` = " .$groupindex. " AND `deleted` = 0")) {
+                        if($res = mysql_query("SELECT `uuid-text`, `ext` FROM files WHERE `hash` = UNHEX('" .$hash. "') AND `size` = " .$size. " AND `group` = " .$groupindex. " AND `deleted` = 0 LIMIT 1")) {
                             if (mysql_num_rows($res) > 0) {
                                 $dup = mysql_fetch_assoc($res);
                             }

@@ -17,7 +17,7 @@
             if($data['Action'] == 'copy') {
                 file_put_contents(
                     $config['log']['commit'],
-                    $date . ' [' . $time . '] ' . $data['ClientIP'] .' '. $data['Action'] .' '. $data['Data']['UUID'] .'.'. $data['Data']['Extension'] .' '. $data['Data']['Size'] .' '. $data['Data']['Hash'] ."\n",
+                    $date . ' [' . $time . '] ' . $data['ClientIP'] .' '. $data['Action'] .' to group '. $data['GroupIndex'] .' '. $data['Data']['UUID'] .'.'. $data['Data']['Extension'] .' '. $data['Data']['Size'] .' '. $data['Data']['Hash'] ."\n",
                     FILE_APPEND | LOCK_EX );
             }
 

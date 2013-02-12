@@ -47,7 +47,9 @@
                 if (!isset($filedata['UUID']))      throw new Exception('no UUID value');
                 if (!preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/', $filedata['UUID']))
                                                     throw new Exception('invalid UUID value');
-                if (!isset($filedata['Source']))    throw new Exception('no Source value - possible server error');
+                if (!isset($filedata['Source']))    throw new Exception('no Source value - possible nginx misconfiguration');
+                if (!isset($filedata['Hash']))      throw new Exception('no Hash value - possible nginx misconfiguration');
+                if (!isset($filedata['Size']))      throw new Exception('no Size value - possible nginx misconfiguration');
 
                 $filedata['Filename'] = trim($filedata['Filename']);
                 if (!$filedata['Filename'])         throw new Exception('empty Filename value');
@@ -55,19 +57,42 @@
                 $filedata['Extension'] = trim($filedata['Extension']);
                 if (!$filedata['Extension'])        throw new Exception('empty Extension value');
 
-                $path = substr($filedata['UUID'], 32, 2) .'/'. substr($filedata['UUID'], 30, 2);
-                $filename = $filedata['UUID'] .'.'. $filedata['Extension'];
-                $targetdir = $config['node']['storage'] .'/'. $path;
-                $targetfile = $targetdir .'/'. $filename;
+                $link_prefix = substr($filedata['UUID'], 32, 2) .'/'. substr($filedata['UUID'], 30, 2); //$path
+                $link_file = $filedata['UUID'] .'.'. $filedata['Extension']; //$filename
+                $link_dir = $config['node']['storage'] .'/'. $link_prefix; //$target_dir
+                $link_path = $link_dir .'/'. $link_file; //$target_path
 
-                if (!(is_dir($targetdir) || mkdir ($targetdir, 0755, true)))
-                    throw new Exception("Could not create target directory '$targetdir'");
+                $hash_prefix = substr($filedata['Hash'], 0, 2) .'/'. substr($filedata['Hash'], 2, 2) .'/'. substr($filedata['Hash'], 4, 2);
+                $hash_file = substr($filedata['Hash'], 6) .':'. $filedata['Size'] .'.'. $filedata['Extension'];;
+                $hash_dir = $config['node']['hashstorage'] .'/'. $hash_prefix;
+                $hash_path = $hash_dir .'/'. $hash_file;
 
-                if (!rename($filedata['Source'], $targetfile))
-                    throw new Exception("Could not move '" . $filedata['Source'] ."' to '". $targetfile ."'");
+                $new_hash = false;
+
+                $lock = lock($filedata['Hash']);
+
+                if (!file_exists($hash_path)) {
+
+                    if (!(is_dir($hash_dir) || mkdir ($hash_dir, 0755, true)))
+                        throw new Exception("Could not create target directory '$hash_dir'");
+
+                    if (!rename($filedata['Source'], $hash_path))
+                        throw new Exception("Could not move '" . $filedata['Source'] ."' to '". $hash_path ."'");
+
+                    if (!xattr_set($hash_path, 'md5', $filedata['Hash']))
+                        throw new Exception("Could not set attribute on '". $hash_path ."'");
+
+                    $new_hash = true;
+                }
+
+                if (!(is_dir($link_dir) || mkdir ($link_dir, 0755, true)))
+                    throw new Exception("Could not create target directory '$link_dir'");
+
+                if (!link($hash_path, $link_path))
+                    throw new Exception("Could link '" . $hash_path ."' to '". $link_path ."'");
 
                 try {
-                    $filedata['Source'] = $path .'/'. $filename;
+                    $filedata['Source'] = $link_prefix .'/'. $link_file;
                     $filedata['Host'] = $config['node']['hostname'];
                     if (!mq_send_to_slaves(serialize(array(
                                             'Action' => 'copy',
@@ -80,12 +105,15 @@
                         throw new Exception('AMQPExchange::publish returned FALSE');
 
                 } catch(Exception $exception) {
-                        unlink($targetfile);
+                        unlink($link_path);
+                        if ($new_hash) unlink($hash_path);
                         throw $exception;
                 }
 
+                unlock($lock);
+
                 $result['Status']['OK']++;
-                $result[$fileindex] = array('OK' => $config['group']['prefix'] .'/'. $path .'/'. $filename);
+                $result[$fileindex] = array('OK' => $config['group']['prefix'] .'/'. $link_prefix .'/'. $link_file);
 
             } catch (Exception $exception) {
                 $result[$fileindex] = array('FAIL' => $exception->getMessage());

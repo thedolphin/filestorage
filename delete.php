@@ -33,12 +33,12 @@
                 if (!preg_match('/^[0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}$/', $filedata['UUID']))
                                                     throw new Exception('invalid UUID value');
 
-                $path = substr($filedata['UUID'], 32, 2) .'/'. substr($filedata['UUID'], 30, 2);
-                $filename = $filedata['UUID'] .'.'. $filedata['Extension'];
-                $targetdir = $config['node']['storage'] .'/'. $path;
-                $targetfile = $targetdir .'/'. $filename;
+                $link_prefix = substr($filedata['UUID'], 32, 2) .'/'. substr($filedata['UUID'], 30, 2); //$path
+                $link_file = $filedata['UUID'] .'.'. $filedata['Extension']; //$filename
+                $link_dir = $config['node']['storage'] .'/'. $link_prefix; //$targetdir
+                $link_path = $link_dir .'/'. $link_file; //$targetfile
 
-                $filedata['Source'] = $path .'/'. $filename;
+                $filedata['Source'] = $link_prefix .'/'. $link_file;
                 if (!mq_broadcast(serialize(array('Action' => 'delete', 'Time' => time(), 'ClientIP' => $client, 'Data' => $filedata))))
                         throw new Exception('AMQPExchange::publish returned FALSE');
 

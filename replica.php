@@ -26,7 +26,25 @@
             }
 
             if ($data['Action'] == 'delete') {
-                unlink($targetfile);
+                if($stat = stat($targetfile)) {
+                    if ($hash = xattr_get($targetfile, 'md5'))
+                        $lock = lock($hash);
+
+                    if (!unlink($targetfile)) throw new Exception("Cannot delete file '" . $targetfile . '"');
+
+                    if ($hash) {
+                        $hash_prefix = substr($hash, 0, 2) .'/'. substr($hash, 2, 2) .'/'. substr($hash, 4, 2);
+                        $hash_file = substr($hash, 6) .':'. $stat['size'] .'.'. $data['Data']['Extension'];
+                        $hash_dir = $config['node']['hashstorage'] .'/'. $hash_prefix;
+                        $hash_path = $hash_dir .'/'. $hash_file;
+
+                        if ($stat = stat($hash_path))
+                            if ($stat['nlink'] == 1)
+                                unlink($hash_path);
+
+                        unlock($lock);
+                    }
+                }
             }
 
             if ($data['Action'] == 'dedup') {

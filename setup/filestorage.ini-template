@@ -2,6 +2,8 @@
 hostname=img01-1
 hostprefix=http://imgtest1.lan
 storage=/vol/storage
+hashstorage=/vol/storage.hash
+lockdir=/dev/shm
 
 [group]
 prefix=http://imgtest.lan

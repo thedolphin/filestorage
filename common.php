@@ -2,9 +2,18 @@
 
 function init() {
 
+    if (!phpversion('xattr'))
+        throw new Exception('No xattr support in PHP');
+
+    if (!phpversion('amqp'))
+        throw new Exception('No AMQP support in PHP');
+
     global $config;
 
     $config = parse_ini_file('filestorage.ini', true, INI_SCANNER_RAW);
+
+    if (!xattr_supported($config['node']['storage']))
+        throw new Exception('No extended attributes support for "' . $config['node']['lockdir'] . '" or directory not readable');
 }
 
 function mq_init() {
@@ -59,4 +68,21 @@ function mq_send_to_slaves($message) {
     global $config;
 
     return $amqp_pub->publish($message, '', 0, array('headers' => array($config['node']['hostname'] => 'yes', 'log' => 'yes', 'db' => 'yes' )));
+}
+
+function lock($name) {
+
+    global $config;
+
+    $fn = $config['node']['lockdir'] .'/'. $name . '.lock';
+    $fh = fopen($fn, 'c');
+    flock($fh, LOCK_EX);
+
+    return array('fn' => $fn, 'fh' => $fh);
+}
+
+function unlock($lock) {
+
+    fclose($lock['fh']);
+    unlink($lock['fn']);
 }

@@ -57,13 +57,13 @@
                 $filedata['Extension'] = trim($filedata['Extension']);
                 if (!$filedata['Extension'])        throw new Exception('empty Extension value');
 
-                $link_prefix = substr($filedata['UUID'], 32, 2) .'/'. substr($filedata['UUID'], 30, 2); //$path
-                $link_file = $filedata['UUID'] .'.'. $filedata['Extension']; //$filename
-                $link_dir = $config['node']['storage'] .'/'. $link_prefix; //$target_dir
-                $link_path = $link_dir .'/'. $link_file; //$target_path
+                $link_prefix = substr($filedata['UUID'], 32, 2) .'/'. substr($filedata['UUID'], 30, 2);
+                $link_file = $filedata['UUID'] .'.'. $filedata['Extension'];
+                $link_dir = $config['node']['storage'] .'/'. $link_prefix;
+                $link_path = $link_dir .'/'. $link_file;
 
                 $hash_prefix = substr($filedata['Hash'], 0, 2) .'/'. substr($filedata['Hash'], 2, 2) .'/'. substr($filedata['Hash'], 4, 2);
-                $hash_file = substr($filedata['Hash'], 6) .':'. $filedata['Size'] .'.'. $filedata['Extension'];;
+                $hash_file = substr($filedata['Hash'], 6) .':'. $filedata['Size'] .'.'. $filedata['Extension'];
                 $hash_dir = $config['node']['hashstorage'] .'/'. $hash_prefix;
                 $hash_path = $hash_dir .'/'. $hash_file;
 
@@ -88,7 +88,7 @@
                 if (!(is_dir($link_dir) || mkdir ($link_dir, 0755, true)))
                     throw new Exception("Could not create target directory '$link_dir'");
 
-                if (!link($hash_path, $link_path))
+                if (!link($link_path, $hash_path)) // $link_path <- $hash_path
                     throw new Exception("Could link '" . $hash_path ."' to '". $link_path ."'");
 
                 try {

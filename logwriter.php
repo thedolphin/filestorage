@@ -14,32 +14,32 @@
             $time = $data['Time'];
             $date = date('Y-m-d H:i:s', $time);
 
-            if($data['Action'] == 'copy') {
+            if($data['action'] == 'copy') {
                 file_put_contents(
                     $config['log']['commit'],
-                    $date . ' [' . $time . '] ' . $data['ClientIP'] .' '. $data['Action'] .' to group '. $data['GroupIndex'] .' '. $data['Data']['UUID'] .'.'. $data['Data']['Extension'] .' '. $data['Data']['Size'] .' '. $data['Data']['Hash'] ."\n",
+                    $date . ' [' . $time . '] ' .
+                        $data['clientip'] .
+                        ' copy to group '.  $data['groupindex'] .' '.
+                        $data['meta']['UUID'] .'.'. $data['meta']['Extension'] .' '.
+                        $data['spec']['size'] .' '. $data['spec'][$config['node']['hashalgo']] ."\n",
                     FILE_APPEND | LOCK_EX );
             }
 
-            if($data['Action'] == 'delete') {
+            if($data['action'] == 'delete') {
                 file_put_contents(
                     $config['log']['commit'],
-                    $date . ' [' . $time . '] ' . $data['ClientIP'] .' '. $data['Action'] .' '. $data['Data']['UUID'] .'.'. $data['Data']['Extension'] ."\n",
+                    $date . ' [' . $time . '] ' .
+                        $data['clientip'] .
+                        ' delete '. $data['Data']['UUID'] .'.'. $data['Data']['Extension'] ."\n",
                     FILE_APPEND | LOCK_EX );
             }
-
-            if($data['Action'] == 'dedup') {
-                file_put_contents(
-                    $config['log']['commit'],
-                    $date . ' [' . $time . '] ' . $data['ClientIP'] .' '. $data['Action'] .' '. $data['Files'][0] .' => '. $data['Files'][1] ."\n",
-                    FILE_APPEND | LOCK_EX );
-            }
-
 
             $amqp_sub->ack($message->getDeliveryTag());
         }
 
-    } catch (Exception $exception) {
+    }
+
+    catch (Exception $exception) {
         print $exception->getMessage() . "\n";
     }
 

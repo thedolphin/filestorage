@@ -14,6 +14,9 @@ function init() {
 
     if (!xattr_supported($config['node']['storage']))
         throw new Exception('No extended attributes support for "' . $config['node']['lockdir'] . '" or directory not readable');
+
+    if ($config['hashalgo'] != 'md5' || $config['hashalgo'] != 'sha256')
+        throw new Exception('Hash algorithm "' . $config['hashalgo'] . '" not supported');
 }
 
 function mq_init() {
@@ -56,18 +59,15 @@ function mq_broadcast($message) {
     return $amqp_pub->publish($message, '', 0, array('headers' => array('broadcast' => 'yes')));
 }
 
-function mq_send_to_group($message, $groupindex) {
-
-    global $amqp_pub;
-    return $amqp_pub->publish($message, '', 0, array('headers' => array('group' . $groupindex => 'yes', 'log' => 'yes')));
-}
-
 function mq_send_to_slaves($message) {
 
     global $amqp_pub;
     global $config;
 
-    return $amqp_pub->publish($message, '', 0, array('headers' => array($config['node']['hostname'] => 'yes', 'log' => 'yes', 'db' => 'yes' )));
+    return $amqp_pub->publish($message, '', 0, array('headers' => array(
+                                                                    $config['node']['hostname'] => 'yes',
+                                                                    'log' => 'yes',
+                                                                    'db' => 'yes' )));
 }
 
 function lock($name) {
@@ -81,8 +81,11 @@ function lock($name) {
     return array('fn' => $fn, 'fh' => $fh);
 }
 
-function unlock($lock) {
+function unlock(&$lock) {
 
-    fclose($lock['fh']);
-    unlink($lock['fn']);
+    if (isset($lock)) {
+        fclose($lock['fh']);
+        unlink($lock['fn']);
+        unset($lock);
+    }
 }

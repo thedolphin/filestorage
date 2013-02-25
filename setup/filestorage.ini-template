@@ -3,6 +3,7 @@ hostname=img01-1
 hostprefix=http://imgtest1.lan
 storage=/vol/storage
 hashstorage=/vol/storage.hash
+hashalgo=sha256
 lockdir=/dev/shm
 
 [group]
@@ -28,9 +29,4 @@ user=fsuser
 pass=fspass
 host=imgtest2.lan
 db=filestorage
-
-[memcache]
-host=127.0.0.1
-port=11211
-cacheall=yes
-enable=yes
+delete=yes

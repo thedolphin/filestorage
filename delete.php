@@ -33,19 +33,20 @@
                 if (!preg_match('/^[0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}$/', $filedata['UUID']))
                                                     throw new Exception('invalid UUID value');
 
-                $link_prefix = substr($filedata['UUID'], 32, 2) .'/'. substr($filedata['UUID'], 30, 2); //$path
-                $link_file = $filedata['UUID'] .'.'. $filedata['Extension']; //$filename
-                $link_dir = $config['node']['storage'] .'/'. $link_prefix; //$targetdir
-                $link_path = $link_dir .'/'. $link_file; //$targetfile
+                if (!mq_broadcast(serialize(array(
+                            'action' => 'delete',
+                            'time' => time(),
+                            'clientip' => $client,
+                            'meta' => $filedata))))
 
-                $filedata['Source'] = $link_prefix .'/'. $link_file;
-                if (!mq_broadcast(serialize(array('Action' => 'delete', 'Time' => time(), 'ClientIP' => $client, 'Data' => $filedata))))
-                        throw new Exception('AMQPExchange::publish returned FALSE');
+                    throw new Exception('AMQPExchange::publish returned FALSE');
 
                 $result['Status']['OK']++;
                 $result[$fileindex] = array('OK' => 1);
 
-            } catch (Exception $exception) {
+            }
+
+            catch (Exception $exception) {
                 $result[$fileindex] = array('FAIL' => $exception->getMessage());
             }
         }
@@ -53,7 +54,9 @@
         header('HTTP/1.1 200 Ok');
         print str_replace('\/', '/', json_encode($result));
 
-    } catch (Exception $exception) {
+    }
+
+    catch (Exception $exception) {
         header('HTTP/1.1 500 Server Error');
         print $exception->getMessage() . "\n";
     }

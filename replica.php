@@ -17,8 +17,6 @@ try {
 
         $stat = stat($link_path);
 
-        unset($lock);
-
         if ($data['action'] == 'copy' && !$stat) {
 
             $hash = $data['spec'][$config['node']['hashalgo']];
@@ -79,7 +77,7 @@ try {
 
                 try {
 
-                    if ($hash = xattr_get($link_path, 'user.hash_' . $config['node']['hashalgo'])) {
+                    if ($hash = xattr_get($link_path, 'user.' . $config['node']['hashalgo'])) {
 
                         $lock = lock($hash);
 

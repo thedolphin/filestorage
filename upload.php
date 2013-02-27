@@ -84,7 +84,7 @@
 
                         $new_hash = true;
 
-                        if (!xattr_set($hash_path, 'user.hash_' . $config['hashalgo'], $hash))
+                        if (!xattr_set($hash_path, 'user.' . $config['hashalgo'], $hash))
                             throw new Exception("Could not set attribute on '". $hash_path ."'");
 
                     }

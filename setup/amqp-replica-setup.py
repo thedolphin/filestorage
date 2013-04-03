@@ -34,9 +34,11 @@ channel.queue_declare(queue = queuename, durable = True, arguments = queue_args)
 bind_args = dict()
 bind_args['x-match'] = 'any'
 bind_args['broadcast'] = 'yes'
-bind_args['group' + config.get('group', 'index')] = 'yes'
 
-for parent in config.get('replica', 'parents').split(','):
-    bind_args[parent] = 'yes'
+parents = config.get('replica', 'parents')
+
+if parents != 'none':
+    for parent in parents.split(','):
+        bind_args[parent] = 'yes'
 
 channel.queue_bind(queue = queuename, exchange = 'filestorage', arguments = bind_args)

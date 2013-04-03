@@ -95,17 +95,19 @@
                     if (!link($link_path, $hash_path)) // $link_path <- $hash_path
                         throw new Exception("Could link '" . $hash_path ."' to '". $link_path ."'");
 
-                    if (!mq_send_to_slaves(serialize(array(
-                                                'action' => 'copy',
-                                                'time' => time(),
-                                                'host' => $config['node']['hostname'],
-                                                'prefix' => $config['node']['hostprefix'],
-                                                'groupindex' => $config['group']['index'],
-                                                'clientip' => $client,
-                                                'meta' => $filedata['meta'],
-                                                'spec' => $filedata['spec']))))
+                    if ($config['node']['replication'] == 'yes') {
+                        if (!mq_send_to_slaves(serialize(array(
+                            'action' => 'copy',
+                            'time' => time(),
+                            'host' => $config['node']['hostname'],
+                            'prefix' => $config['node']['hostprefix'],
+                            'groupindex' => $config['group']['index'],
+                            'clientip' => $client,
+                            'meta' => $filedata['meta'],
+                            'spec' => $filedata['spec']))))
 
-                            throw new Exception('AMQPExchange::publish returned FALSE');
+                                throw new Exception('AMQPExchange::publish returned FALSE');
+                    }
 
                 }
 
@@ -119,7 +121,7 @@
                 unlock($lock);
 
                 $result['Status']['OK']++;
-                $result[$fileindex] = array('OK' => $config['group']['prefix'] .'/'. $link_prefix .'/'. $link_file);
+                $result[$fileindex] = array('OK' => $config['node']['groupprefix'] .'/'. $link_prefix .'/'. $link_file);
 
             }
 

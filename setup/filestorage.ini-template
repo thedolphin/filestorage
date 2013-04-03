@@ -1,22 +1,35 @@
 [node]
+; node unique distinguisher, used for queues routing
 hostname=img01-1
+
+; node prefix for curl to fetch files in replication mode
 hostprefix=http://imgtest1.lan
+
+; prefix to append for return url, unique for replication group, must be balanced elsewhere with absent failover.
+groupprefix=http://imgtest.lan
+
+; whether node should send replication events
+replication = yes
+
+; path to storage, must be on the same device with ngx_upload temp dir
 storage=/vol/storage
+
+; path to hash storage, must be on the same device with storage for hardlinks to work.
 hashstorage=/vol/storage.hash
+
+; hash algothithm, sha256 or md5
 hashalgo=sha256
+
+; directory to place lockfiles, tmpfs prefered
 lockdir=/dev/shm
 
-[group]
-prefix=http://imgtest.lan
-index=1
-
-[log]
-commit=/vol/filestorage.log
-
+; replica module configuration
 [replica]
+; comma-separated node distinguishers, from which files must be replicated
+; special word 'none' means no replication used
 parents=img01-2
-rabbit=rabbit@imgtest1,rabbit@imgtest2
 
+; AMQP broker client configuration
 [amqp]
 user=fsuser
 pass=fspass
@@ -24,9 +37,14 @@ host=127.0.0.1
 port=5672
 vhost=/filestorage
 
+; dbwriter module only, mysql client configuration, may be safely removed if dbwriter module not used locally
 [db]
 user=fsuser
 pass=fspass
 host=imgtest2.lan
 db=filestorage
 delete=yes
+
+; logwriter module only, may be safely removed if logwriter module not used locally
+[log]
+commit=/vol/filestorage.log

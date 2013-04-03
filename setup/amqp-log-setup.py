@@ -18,15 +18,6 @@ channel = connection.channel()
 
 channel.exchange_declare(exchange = 'filestorage', type = 'headers', durable = True);
 
-mirror = config.get('replica','rabbit')
-queue_args = dict()
-
-if mirror == 'all':
-    queue_args['x-ha-policy'] = 'all'
-elif mirror != 'none':
-    queue_args['x-ha-policy'] = 'nodes'
-    queue_args['x-ha-policy-params'] = mirror.split(',');
-
 queuename = 'filestorage.logwriter'
 
 channel.queue_declare(queue = queuename, durable = True, arguments = queue_args)

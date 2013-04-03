@@ -20,7 +20,7 @@ channel.exchange_declare(exchange = 'filestorage', type = 'headers', durable = T
 
 queuename = 'filestorage.dbwriter'
 
-channel.queue_declare(queue = queuename, durable = True, arguments = queue_args)
+channel.queue_declare(queue = queuename, durable = True)
 
 bind_args = dict()
 bind_args['x-match'] = 'any'

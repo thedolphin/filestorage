@@ -77,7 +77,7 @@ try {
 
                 try {
 
-                    if ($hash = xattr_get($link_path, 'user.' . $config['node']['hashalgo'])) {
+                    if ($hash = xattr_get($link_path, $config['node']['hashalgo'])) {
 
                         $lock = new lock($hash);
 

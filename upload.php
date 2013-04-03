@@ -85,7 +85,7 @@
 
                         $new_hash = true;
 
-                        if (!xattr_set($hash_path, 'user.' . $config['hashalgo'], $hash))
+                        if (!xattr_set($hash_path, $config['node']['hashalgo'], $hash))
                             throw new Exception("Could not set attribute on '". $hash_path ."'");
 
                     }
@@ -130,7 +130,7 @@
                 $result[$fileindex] = array('FAIL' => $exception->getMessage());
             }
 
-            unlock($lock);
+            unset($lock);
         }
 
         header('HTTP/1.1 200 Ok');

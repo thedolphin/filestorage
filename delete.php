@@ -1,8 +1,6 @@
 <?php
     require 'common.php';
 
-    init();
-
     $result = array('Status' => array('OK' => 0));
 
     if (!empty($_SERVER['HTTP_X_REAL_IP'])) {
@@ -12,6 +10,8 @@
     }
 
     try {
+
+        init();
 
         mq_init();
         mq_init_pub();

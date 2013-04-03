@@ -26,7 +26,7 @@ try {
             $hash_dir = $config['node']['hashstorage'] .'/'. $hash_prefix;
             $hash_path = $hash_dir .'/'. $hash;
 
-            $lock = lock($hash);
+            $lock = new lock($hash);
 
             try {
 
@@ -64,11 +64,11 @@ try {
             }
 
             catch (Exception $exception) {
-                unlock($lock);
+                unset($lock);
                 throw $exception;
             }
 
-            unlock($lock);
+            unset($lock);
         }
 
         if ($data['action'] == 'delete') {
@@ -79,7 +79,7 @@ try {
 
                     if ($hash = xattr_get($link_path, 'user.' . $config['node']['hashalgo'])) {
 
-                        $lock = lock($hash);
+                        $lock = new lock($hash);
 
                         $hash_prefix = substr($hash, 0, 2) .'/'. substr($hash, 2, 2) .'/'. substr($hash, 4, 2);
                         $hash_file = $hash;
@@ -96,11 +96,11 @@ try {
                 }
 
                 catch(Exception $exception) {
-                    unlock($lock);
+                    unset($lock);
                     throw $exception;
                 }
 
-                unlock($lock);
+                unset($lock);
             }
         }
 

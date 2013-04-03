@@ -23,12 +23,12 @@ queuename = 'filestorage.replica.' + config.get('node', 'hostname')
 channel.queue_declare(queue = queuename, durable = True)
 
 bind_args = dict()
-bind_args['x-match'] = 'any'
 bind_args['broadcast'] = 'yes'
 
 parents = config.get('replica', 'parents')
 
 if parents != 'none':
+    bind_args['x-match'] = 'any'
     for parent in parents.split(','):
         bind_args[parent] = 'yes'
 

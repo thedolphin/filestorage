@@ -15,8 +15,8 @@ function init() {
     if (!xattr_supported($config['node']['storage']))
         throw new Exception('No extended attributes support for "' . $config['node']['lockdir'] . '" or directory not readable');
 
-    if ($config['hashalgo'] != 'md5' || $config['hashalgo'] != 'sha256')
-        throw new Exception('Hash algorithm "' . $config['hashalgo'] . '" not supported');
+    if ($config['node']['hashalgo'] != 'md5' && $config['node']['hashalgo'] != 'sha256')
+        throw new Exception('Hash algorithm "' . $config['node']['hashalgo'] . '" not supported');
 }
 
 function mq_init() {
@@ -70,22 +70,26 @@ function mq_send_to_slaves($message) {
                                                                     'db' => 'yes' )));
 }
 
-function lock($name) {
+class lock {
+    private $filehandler;
+    private $filename;
 
-    global $config;
+    function __construct($name) {
 
-    $fn = $config['node']['lockdir'] .'/'. $name . '.lock';
-    $fh = fopen($fn, 'c');
-    flock($fh, LOCK_EX);
+        global $config;
 
-    return array('fn' => $fn, 'fh' => $fh);
-}
+        $this->filename = $config['node']['lockdir'] .'/'. $name . '.lock';
+        $this->filehandler = fopen($this->filename, 'c');
 
-function unlock(&$lock) {
+        if (!$this->filehandler)
+            throw new Exception('Cannot create lock file: "' .$this->filename. '"');
 
-    if (isset($lock)) {
-        fclose($lock['fh']);
-        unlink($lock['fn']);
-        unset($lock);
+        if (!flock($this->filehandler, LOCK_EX))
+            throw new Exception('Cannot lock file: "' .$this->filename. '"');
+    }
+
+    function __destruct() {
+        fclose($this->filehandler);
+        unlink($this->filename);
     }
 }

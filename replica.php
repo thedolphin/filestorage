@@ -64,6 +64,9 @@ try {
                     if(file_put_contents($hash_path, $body) != strlen($body)) {
                         throw new Exception('Error writing file "' . $hash_path . '"');
                     }
+
+                    if (!xattr_set($hash_path, $config['node']['hashalgo'], $hash))
+                        throw new Exception("Could not set attribute on '". $hash_path ."'");
                 }
 
                 if (!(is_dir($link_dir) || mkdir ($link_dir, 0755, true)))

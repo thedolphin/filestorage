@@ -32,14 +32,14 @@ out("Error: {$error}\nHttp code: {$code}\nBody: {$body}");
 
 if ($retval) {
     $rethash = json_decode($body, true);
-    if ($rethash['Status']['OK'] == count($filedata) {
+    if ($rethash['Status']['OK'] == count($filedata)) {
         out('All files have been deleted successfully');
     } else {
         out('Deletion was not successful');
     }
 
-    out('Waiting 10 secs for queue to be processed');
-    sleep(10);
+    out('Waiting 3 secs for queue to be processed');
+    sleep(3);
 
     foreach($filedata as &$v) {
         $v['delete_error'] = isset($rethash[$i]['FAIL']) ? $rethash[$i]['FAIL'] : NULL;

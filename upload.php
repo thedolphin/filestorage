@@ -75,8 +75,10 @@
 
                 try {
 
-                    if (!file_exists($hash_path)) {
+                    if (file_exists($hash_path)) {
+                        unlink($filedata['spec']['source']);
 
+                    } else {
                         if (!(is_dir($hash_dir) || mkdir ($hash_dir, 0755, true)))
                             throw new Exception("Could not create target directory '$hash_dir'");
 

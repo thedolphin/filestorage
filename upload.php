@@ -93,7 +93,7 @@
                     if (!(is_dir($link_dir) || mkdir ($link_dir, 0755, true)))
                         throw new Exception("Could not create target directory '$link_dir'");
 
-                    if (!link($hash_path, $link_path)) // $link_path <- $hash_path
+                    if (!link($hash_path, $link_path))
                         throw new Exception("Could link '" . $hash_path ."' to '". $link_path ."'");
 
                     if ($config['node']['replication'] == 'yes') {

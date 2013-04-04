@@ -38,27 +38,38 @@ try {
                         throw new Exception('Could not init cURL');
                     }
 
-                    if (!($fp = fopen($hash_path, "w"))) {
-                        throw new Exception('Could not create file "' . $hash_path . '"');
+                    curl_setopt_array($ch, array(
+                        CURLOPT_RETURNTRANSFER => true,
+                        CURLOPT_SSL_VERIFYPEER => false,
+                        CURLOPT_USERAGENT => 'Mozilla/5.0 (compatible; WikimartFileStorage@'. $config['node']['hostname'] .'/2.0; +alexander.rumyantsev@wikimart.ru)'
+                    ));
+
+                    $body = curl_exec($ch);
+
+                    if ($err = curl_errno($ch))
+                        $errtext = curl_error($ch);
+
+                    $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+                    curl_close($ch);
+
+                    if ($err || $httpcode != 200) {
+                        throw new Exception('cURL error: ' . $errtext . ', http response code: ' . $httpcode);
                     }
 
-                    curl_setopt($ch, CURLOPT_FILE, $fp);
-                    curl_setopt($ch, CURLOPT_HEADER, 0);
-                    curl_exec($ch);
-                    $err = curl_errno($ch);
-                    curl_close($ch);
-                    fclose($fp);
+                    if (hash($config['node']['hashalgo'], $body) != $hash) {
+                        throw new Exception('Hash mismatch');
+                    }
 
-                    if ($err) {
-                        @unlink($hash_path);
-                        throw new Exception('cURL error: ' . curl_error($ch));
+                    if(file_put_contents($hash_path, $body) != strlen($body)) {
+                        throw new Exception('Error writing file "' . $hash_path . '"');
                     }
                 }
 
                 if (!(is_dir($link_dir) || mkdir ($link_dir, 0755, true)))
                     throw new Exception("Could not create target directory '$link_dir'");
 
-                if (!link($link_path, $hash_path)) // $link_path <- $hash_path
+                if (!link($hash_path, $link_path))
                     throw new Exception("Could link '" . $hash_path ."' to '". $link_path ."'");
 
             }

@@ -15,7 +15,7 @@ try {
         $link_dir = $config['node']['storage'] .'/'. $link_prefix;
         $link_path = $link_dir .'/'. $link_file;
 
-        $stat = stat($link_path);
+        $stat = @stat($link_path);
 
         if ($data['action'] == 'copy' && !$stat) {
 
@@ -54,7 +54,7 @@ try {
                     curl_close($ch);
 
                     if ($err || $httpcode != 200) {
-                        throw new Exception('cURL error: ' . $errtext . ', http response code: ' . $httpcode);
+                        throw new Exception('cURL error: ' . $errtext . ', http response code: ' . $httpcode, $httpcode);
                     }
 
                     if (hash($config['node']['hashalgo'], $body) != $hash) {
@@ -78,8 +78,10 @@ try {
             }
 
             catch (Exception $exception) {
-                unset($lock);
-                throw $exception;
+                if ($exception->getCode() != 404) {
+                    unset($lock);
+                    throw $exception;
+                }
             }
 
             unset($lock);

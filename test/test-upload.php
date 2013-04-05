@@ -33,7 +33,11 @@ foreach($filedata as $i => $v) {
     $postfields["File$i"] = json_encode(array(
             'Filename' => $v['filename'],
             'Extension' => $fileext,
-            'UUID' => $v['uuid']));
+            'UUID' => $v['uuid'],
+            /* Addtitional metadata to store in DB */
+            'meta1' => 'value1',
+            'meta2' => 'value2'
+    ));
 
     $postfields["Data$i"] = '@' . $v['filename']; // no way to append ';filename=' to form field, except using file reference
 }

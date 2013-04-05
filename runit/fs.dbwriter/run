@@ -7,4 +7,4 @@ DROPROOT="chpst -u ${USER}"
 
 cd /www/filestorage
 
-exec ${DROPROOT} php dbwriter.php
+exec ${DROPROOT} php -c etc/php.ini dbwriter.php

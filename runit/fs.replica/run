@@ -7,4 +7,4 @@ DROPROOT="chpst -u ${USER}"
 
 cd /www/filestorage
 
-exec ${DROPROOT} php replica.php
+exec ${DROPROOT} php -c etc/php.ini replica.php

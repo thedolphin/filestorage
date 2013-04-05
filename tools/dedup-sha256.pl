@@ -24,11 +24,21 @@ sub timedelta {
 
 sub gethash {
     local $fn = shift;
-    $hash = getfattr($fn, 'user.sha256');
-    if ( ! $hash ) {
-        $hash = digest_file_hex($fn, 'SHA-256');
-        setfattr($fn, 'user.sha256', $hash);
+
+    if (getfattr($fn, 'md5')) {
+        delfattr($fn, 'md5');
     }
+
+    if ($hash = getfattr($fn, 'user.sha256')) {
+        delfattr($fn, 'user.sha256');
+        setfattr($fn, 'sha256', $hash);
+        return $hash
+    }
+
+    if(!($hash = getfattr($fn, 'sha256'))) {
+        $hash = digest_file_hex($fn, 'SHA-256');
+    }
+
     return $hash;
 }
 

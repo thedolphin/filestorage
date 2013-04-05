@@ -30,7 +30,18 @@ try {
 
             try {
 
-                if (!file_exists($hash_path)) {
+                if (file_exists($hash_path)) {
+                    /*
+                    compatibility:
+                    we may have old version hash storage
+                    with different hash attributes
+                    */
+
+                    if (!xattr_get($link_path, $config['node']['hashalgo']))
+                        if (!xattr_set($hash_path, $config['node']['hashalgo'], $hash))
+                            throw new Exception("Could not set attribute on '". $hash_path ."'");
+
+                } else {
                     if (!(is_dir($hash_dir) || mkdir ($hash_dir, 0755, true)))
                         throw new Exception("Could not create target directory '$hash_dir'");
 
@@ -61,7 +72,7 @@ try {
                         throw new Exception('Hash mismatch');
                     }
 
-                    if(file_put_contents($hash_path, $body) != strlen($body)) {
+                    if (file_put_contents($hash_path, $body) != strlen($body)) {
                         throw new Exception('Error writing file "' . $hash_path . '"');
                     }
 
@@ -89,7 +100,7 @@ try {
 
         if ($data['action'] == 'delete') {
 
-            if($stat) {
+            if ($stat) {
 
                 try {
 

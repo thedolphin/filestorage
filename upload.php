@@ -78,6 +78,16 @@
                     if (file_exists($hash_path)) {
                         unlink($filedata['spec']['source']);
 
+                        /*
+                        compatibility:
+                        we may have old version hash storage
+                        with different hash attributes
+                        */
+
+                        if (!xattr_get($link_path, $config['node']['hashalgo']))
+                            if (!xattr_set($hash_path, $config['node']['hashalgo'], $hash))
+                                throw new Exception("Could not set attribute on '". $hash_path ."'");
+
                     } else {
                         if (!(is_dir($hash_dir) || mkdir ($hash_dir, 0755, true)))
                             throw new Exception("Could not create target directory '$hash_dir'");
@@ -104,7 +114,6 @@
                             'time' => time(),
                             'host' => $config['node']['hostname'],
                             'prefix' => $config['node']['hostprefix'],
-                            'groupindex' => $config['group']['index'],
                             'clientip' => $client,
                             'meta' => $filedata['meta'],
                             'spec' => $filedata['spec']))))

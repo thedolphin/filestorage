@@ -11,8 +11,8 @@ groupprefix=http://imgtest.lan
 ; group index, used to store in database
 groupindex=1
 
-; whether node should send replication events
-replication = yes
+; whether node should send replication events for replica, logwriter and dbwriter
+replication=yes
 
 ; path to storage, must be on the same device with ngx_upload temp dir
 storage=/vol/storage

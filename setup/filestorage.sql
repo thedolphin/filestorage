@@ -6,7 +6,7 @@ CREATE TABLE `files` (
   `deleted` boolean NOT NULL DEFAULT FALSE,
   `linked` boolean NOT NULL DEFAULT FALSE COMMENT 'True, if there is corresponding valid records in main database',
   PRIMARY KEY (`uuid`),
-  KEY (`hash`, `group`, `deleted`),
+  KEY (`hash`, `group`, `deleted`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `attributes` (

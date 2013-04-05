@@ -31,7 +31,7 @@
                 if ($data['action'] == 'copy') {
 
                     if(!mysql_query('INSERT IGNORE INTO files(`uuid`,`date`, `hash`, `group`) ' .
-                        "VALUES (UNHEX(REPLACE('". $uuid ."', '-', '')), '". $uuid ."', FROM_UNIXTIME(". $time ."), UNHEX('". $hash ."'), ". $groupindex .")"))
+                        "VALUES (UNHEX(REPLACE('". $uuid ."', '-', '')), FROM_UNIXTIME(". $time ."), UNHEX('". $hash ."'), ". $groupindex .")"))
                         throw new Exception("Cannot insert file for UUID $uuid into table files: " . mysql_error ($db));
 
                     foreach ($data['meta'] as $attribute=>$value) {
@@ -40,7 +40,7 @@
                     }
                 }
 
-                if ($data['Action'] == 'delete') {
+                if ($data['action'] == 'delete') {
                     if ($config['db']['delete'] == 'no') {
                         if(!mysql_query("UPDATE IGNORE files SET deleted = TRUE, date = FROM_UNIXTIME(" .$time. ") WHERE `uuid` = UNHEX(REPLACE('". $uuid ."', '-', ''))"))
                             throw new Exception("Cannot update file with UUID $uuid: " . mysql_error ($db));

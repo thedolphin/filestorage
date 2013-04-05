@@ -20,7 +20,7 @@ channel.exchange_declare(exchange = 'filestorage', type = 'headers', durable = T
 
 queuename = 'filestorage.logwriter'
 
-channel.queue_declare(queue = queuename, durable = True
+channel.queue_declare(queue = queuename, durable = True)
 
 bind_args = dict()
 bind_args['x-match'] = 'any'

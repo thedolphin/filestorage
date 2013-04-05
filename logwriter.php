@@ -11,7 +11,7 @@
 
         while($message = $amqp_sub->get()) {
             $data = unserialize($message->getBody());
-            $time = $data['Time'];
+            $time = $data['time'];
             $date = date('Y-m-d H:i:s', $time);
 
             if($data['action'] == 'copy') {
@@ -19,7 +19,7 @@
                     $config['log']['commit'],
                     $date . ' [' . $time . '] ' .
                         $data['clientip'] .
-                        ' copy to group '.  $data['groupindex'] .' '.
+                        ' => ' . $data['host'] .' upload ' .
                         $data['meta']['UUID'] .'.'. $data['meta']['Extension'] .' '.
                         $data['spec']['size'] .' '. $data['spec'][$config['node']['hashalgo']] ."\n",
                     FILE_APPEND | LOCK_EX );
@@ -30,7 +30,8 @@
                     $config['log']['commit'],
                     $date . ' [' . $time . '] ' .
                         $data['clientip'] .
-                        ' delete '. $data['Data']['UUID'] .'.'. $data['Data']['Extension'] ."\n",
+                        ' => ' . $data['host'] .' delete '.
+                        $data['Data']['UUID'] .'.'. $data['Data']['Extension'] ."\n",
                     FILE_APPEND | LOCK_EX );
             }
 

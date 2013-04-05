@@ -37,6 +37,7 @@
                             'action' => 'delete',
                             'time' => time(),
                             'clientip' => $client,
+                            'host' => $config['node']['hostname'],
                             'meta' => $filedata))))
 
                     throw new Exception('AMQPExchange::publish returned FALSE');

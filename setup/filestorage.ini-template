@@ -8,6 +8,9 @@ hostprefix=http://imgtest1.lan
 ; prefix to append for return url, unique for replication group, must be balanced elsewhere with absent failover.
 groupprefix=http://imgtest.lan
 
+; group index, used to store in database
+groupindex=1
+
 ; whether node should send replication events
 replication = yes
 
@@ -43,6 +46,8 @@ user=fsuser
 pass=fspass
 host=imgtest2.lan
 db=filestorage
+
+; whether delete records permanently or mark as deleted only
 delete=yes
 
 ; logwriter module only, may be safely removed if logwriter module not used locally

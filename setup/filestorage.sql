@@ -1,5 +1,5 @@
 CREATE TABLE `files` (
-  `uuid` binary(16) NOT NULL COMMENT 'Converted UUID value',
+  `uuid` binary(16) NOT NULL COMMENT 'Binary UUID value',
   `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `hash` binary(32) NOT NULL COMMENT 'Hash of file content',
   `group` int(11) NOT NULL COMMENT 'Group index',
@@ -10,7 +10,7 @@ CREATE TABLE `files` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `attributes` (
-  `uuid` binary(16) NOT NULL,
+  `uuid` binary(16) NOT NULL COMMENT 'Binary UUID value',
   `attribute` varchar(32) NOT NULL,
   `value` varchar(256) NOT NULL,
   KEY (`uuid`)

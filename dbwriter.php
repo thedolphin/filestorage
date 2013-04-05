@@ -21,7 +21,7 @@
             $hash   = $data['spec'][$config['node']['hashalgo']];
 
             $client = $data['clientip'];
-            $groupindex = $data['groupindex'];
+            $groupindex = $data['group'];
             $time = $data['time'];
 
             if (!mysql_query("BEGIN")) throw new Exception("Lack of transaction support detected");
@@ -30,7 +30,7 @@
 
                 if ($data['action'] == 'copy') {
 
-                    if(!mysql_query('INSERT IGNORE INTO files(`uuid`,`uuid-text`,`date`, `hash`, `group`) ' .
+                    if(!mysql_query('INSERT IGNORE INTO files(`uuid`,`date`, `hash`, `group`) ' .
                         "VALUES (UNHEX(REPLACE('". $uuid ."', '-', '')), '". $uuid ."', FROM_UNIXTIME(". $time ."), UNHEX('". $hash ."'), ". $groupindex .")"))
                         throw new Exception("Cannot insert file for UUID $uuid into table files: " . mysql_error ($db));
 

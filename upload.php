@@ -113,6 +113,7 @@
                             'action' => 'copy',
                             'time' => time(),
                             'host' => $config['node']['hostname'],
+                            'group' => $config['node']['groupindex'],
                             'prefix' => $config['node']['hostprefix'],
                             'clientip' => $client,
                             'meta' => $filedata['meta'],

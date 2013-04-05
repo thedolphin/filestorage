@@ -31,7 +31,7 @@
                     $date . ' [' . $time . '] ' .
                         $data['clientip'] .
                         ' => ' . $data['host'] .' delete '.
-                        $data['Data']['UUID'] .'.'. $data['Data']['Extension'] ."\n",
+                        $data['meta']['UUID'] .'.'. $data['meta']['Extension'] ."\n",
                     FILE_APPEND | LOCK_EX );
             }
 

@@ -1,7 +1,7 @@
 #!/usr/bin/php
 <?php
 
-$url = 'http://127.0.0.1';
+$url = 'http://imgtest1.lan';
 $fileext = 'bin';
 $storageprefix = '/vol/storage';
 $resultsfile = 'test-data.php';

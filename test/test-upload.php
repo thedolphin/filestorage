@@ -1,9 +1,9 @@
 #!/usr/bin/php
 <?php
 
-$url = 'http://127.0.0.1';
+$url = '127.0.0.1';
 $filesnum = 5;
-$fileext = 'bin';
+$fileext = class_exists("Imagick") ? 'png' : 'bin';
 $storageprefix = '/vol/storage';
 $resultsfile = 'test-data.php';
 
@@ -13,16 +13,32 @@ out('Generating some data');
 
 for ($i = 1; $i <= $filesnum; $i++) {
     $filedata[$i]['uuid'] = exec('uuidgen');
-    $filedata[$i]['filename'] = "testfile$i";
+    $filedata[$i]['filename'] = "testfile{$i}.{$fileext}";
     if (file_exists($filedata[$i]['filename'])) {
         $filedata[$i]['size'] = filesize($filedata[$i]['filename']);
         $data = file_get_contents($filedata[$i]['filename']);
     } else {
-        $filedata[$i]['size'] = rand(0,100) + 1048526;
-        $fh = fopen('/dev/urandom', 'r');
-        $data = fread($fh, $filedata[$i]['size']);
-        fclose($fh);
-        file_put_contents($filedata[$i]['filename'], $data);
+        if ($fileext == 'png') {
+            $img  = new Imagick();
+            $px   = new ImagickPixel('white');
+            $draw = new ImagickDraw();
+            $img->newImage(200, 200, $px);
+            $img->setImageFormat('png');
+            $draw->setFillColor('black');
+            $draw->setFont('Verdana');
+            $draw->setFontSize(20);
+            $img->annotateImage($draw, 10, 100, 0, $filedata[$i]['filename']);
+            $img->writeImage($filedata[$i]['filename']);
+            unset($img); unset($draw); unset($px);
+            $filedata[$i]['size'] = filesize($filedata[$i]['filename']);
+            $data = file_get_contents($filedata[$i]['filename']);
+        } else {
+            $filedata[$i]['size'] = rand(0,100) + 1048526;
+            $fh = fopen('/dev/urandom', 'r');
+            $data = fread($fh, $filedata[$i]['size']);
+            fclose($fh);
+            file_put_contents($filedata[$i]['filename'], $data);
+        }
     }
     $filedata[$i]['sha256'] = hash('sha256', $data);
 }

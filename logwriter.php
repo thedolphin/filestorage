@@ -20,9 +20,9 @@
                     $date . ' [' . $time . '] ' .
                         $data['clientip'] .
                         ' => ' . $data['host'] .' upload ' .
+                        $data['group'] .' '.
                         $data['meta']['UUID'] .'.'. $data['meta']['Extension'] .' '.
-                        $data['spec']['size'] .' '. $data['spec'][$config['node']['hashalgo']] .' '.
-                        $data['group'] . "\n",
+                        $data['spec']['size'] .' '. $data['spec'][$config['node']['hashalgo']] . "\n",
                     FILE_APPEND | LOCK_EX );
             }
 

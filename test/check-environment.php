@@ -1,12 +1,6 @@
 #!/usr/bin/php
 <?php
 
-if (!phpversion('xattr'))
-    print("No xattr support in PHP\n");
-else {
-    if (!xattr_supported($config['node']['storage']))
-        print("No extended attributes support for '{$config['node']['storage']}' or directory not readable\n");
-}
 
 if (!phpversion('amqp'))
     print("No AMQP support in PHP\n");
@@ -20,6 +14,13 @@ if(!$config)
 else {
     if ($config['node']['hashalgo'] != 'md5' && $config['node']['hashalgo'] != 'sha256')
         print("Hash algorithm ' . {$config['node']['hashalgo']}' not supported\n");
+
+    if (!phpversion('xattr'))
+        print("No xattr support in PHP\n");
+    else {
+        if (!xattr_supported($config['node']['storage']))
+            print("No extended attributes support for '{$config['node']['storage']}' or directory not readable\n");
+    }
 }
 
 print("Done\n");

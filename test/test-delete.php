@@ -2,7 +2,7 @@
 <?php
 
 $url = 'http://imgtest1.lan';
-$fileext = 'bin';
+$fileext = class_exists("Imagick") ? 'png' : 'bin';
 $storageprefix = '/vol/storage';
 $resultsfile = 'test-data.php';
 

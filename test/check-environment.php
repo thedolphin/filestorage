@@ -5,7 +5,7 @@ if (!phpversion('xattr'))
     print("No xattr support in PHP\n");
 else {
     if (!xattr_supported($config['node']['storage']))
-        print("No extended attributes support for '{$config['node']['lockdir']} or directory not readable\n");
+        print("No extended attributes support for '{$config['node']['storage']}' or directory not readable\n");
 }
 
 if (!phpversion('amqp'))

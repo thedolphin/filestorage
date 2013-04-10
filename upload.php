@@ -84,7 +84,7 @@
                         with different hash attributes
                         */
 
-                        if (!xattr_get($link_path, $config['node']['hashalgo']))
+                        if (!xattr_get($hash_path, $config['node']['hashalgo']))
                             if (!xattr_set($hash_path, $config['node']['hashalgo'], $hash))
                                 throw new Exception("Could not set attribute on '". $hash_path ."'");
 

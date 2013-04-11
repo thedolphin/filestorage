@@ -125,9 +125,9 @@
                 }
 
                 catch(Exception $exception) {
-                    unset($lock);
                     unlink($link_path);
                     if ($new_hash) unlink($hash_path);
+                    unset($lock);
                     throw $exception;
                 }
 

@@ -3,13 +3,10 @@
 
     try {
 
-        init();
-        mq_init();
+        $config = new config();
+        $queue = new queue($config, 'filestorage.logwriter');
 
-        $amqp_sub = new AMQPQueue(new AMQPChannel($amqp_conn));
-        $amqp_sub->SetName('filestorage.logwriter');
-
-        while($message = $amqp_sub->get()) {
+        while($message = $queue->get()) {
             $data = unserialize($message->getBody());
             $time = $data['time'];
             $date = date('Y-m-d H:i:s', $time);
@@ -36,7 +33,7 @@
                     FILE_APPEND | LOCK_EX );
             }
 
-            $amqp_sub->ack($message->getDeliveryTag());
+            $queue->ack($message);
         }
 
     }

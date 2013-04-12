@@ -11,10 +11,8 @@
 
     try {
 
-        init();
-
-        mq_init();
-        mq_init_pub();
+        $config = new config();
+        $queue = new queue($config);
 
         foreach($_POST as $key => $item) {
             $datatype = substr($key, 0, 4);
@@ -33,14 +31,12 @@
                 if (!preg_match('/^[0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}$/', $filedata['UUID']))
                                                     throw new Exception('invalid UUID value');
 
-                if (!mq_broadcast(serialize(array(
-                            'action' => 'delete',
-                            'time' => time(),
-                            'clientip' => $client,
-                            'host' => $config['node']['hostname'],
-                            'meta' => $filedata))))
-
-                    throw new Exception('AMQPExchange::publish returned FALSE');
+                $queue->broadcast(serialize(array(
+                    'action' => 'delete',
+                    'time' => time(),
+                    'clientip' => $client,
+                    'host' => $config['node']['hostname'],
+                    'meta' => $filedata)));
 
                 $result['Status']['OK']++;
                 $result[$fileindex] = array('OK' => 1);

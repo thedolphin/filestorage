@@ -3,17 +3,13 @@
 
     try {
 
-        init();
-        mq_init();
-        mq_init_pub();
+        $config = new config();
+        $queue = new queue($config, 'filestorage.dbwriter');
 
         if(!$db = mysql_connect ($config['db']['host'], $config['db']['user'], $config['db']['pass'])) throw new Exception("Cannot connect to mysql");
         if(!mysql_select_db($config['db']['db'], $db)) throw new Exception("Cannot connect to database");
 
-        $amqp_sub = new AMQPQueue(new AMQPChannel($amqp_conn));
-        $amqp_sub->SetName('filestorage.dbwriter');
-
-        while($message = $amqp_sub->get()) {
+        while($message = $queue->get()) {
 
             $data = unserialize($message->getBody());
 
@@ -62,7 +58,7 @@
                     throw $exception;
             }
 
-            $amqp_sub->ack($message->getDeliveryTag());
+            $queue->ack($message);
         }
     }
 

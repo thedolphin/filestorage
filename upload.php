@@ -11,10 +11,8 @@
 
     try {
 
-        init();
-
-        mq_init();
-        mq_init_pub();
+        $config = new config();
+        $queue = new queue($config);
 
         foreach($_POST as $key => $item) {
             $datatype = substr($key, 0, 4);
@@ -108,8 +106,8 @@
                     if (!link($hash_path, $link_path))
                         throw new Exception("Could link '" . $hash_path ."' to '". $link_path ."'");
 
-                    if ($config['node']['replication'] == 'yes') {
-                        if (!mq_send_to_slaves(serialize(array(
+                    if ($config['node']['replication'] == 'yes')
+                        $queue->multicast(serialize(array(
                             'action' => 'copy',
                             'time' => time(),
                             'host' => $config['node']['hostname'],
@@ -117,11 +115,7 @@
                             'prefix' => $config['node']['hostprefix'],
                             'clientip' => $client,
                             'meta' => $filedata['meta'],
-                            'spec' => $filedata['spec']))))
-
-                                throw new Exception('AMQPExchange::publish returned FALSE');
-                    }
-
+                            'spec' => $filedata['spec'])));
                 }
 
                 catch(Exception $exception) {

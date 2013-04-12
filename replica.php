@@ -2,11 +2,11 @@
 require "common.php";
 
 try {
-    init();
-    mq_init();
-    mq_init_sub();
 
-    while($message = $amqp_sub->get()) {
+    $config = new config();
+    $queue = new queue($config);
+
+    while($message = $queue->get()) {
 
         $data = unserialize($message->getBody());
 
@@ -131,7 +131,7 @@ try {
             }
         }
 
-        $amqp_sub->ack($message->getDeliveryTag());
+        $queue->ack($message);
     }
 
 }

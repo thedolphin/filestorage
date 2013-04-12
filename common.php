@@ -60,17 +60,18 @@ class queue {
         if (!$this->amqp_pub)
             $this->_init_pub();
 
-        return $this->amqp_pub->publish($message, '', 0, array('headers' => array_fill_keys($headers, 'yes')));
+        if(!$this->amqp_pub->publish($message, '', 0, array('headers' => array_fill_keys($headers, 'yes'))))
+            throw new Exception('AMQP: cannot publish');
     }
 
     function broadcast($message) {
 
-        return $this->_enqueue($message, array('broadcast'));
+        $this->_enqueue($message, array('broadcast'));
     }
 
     function multicast($message) {
 
-        return $this->_enqueue($message, array($this->hostname, 'log', 'db'));
+        $this->_enqueue($message, array($this->hostname, 'log', 'db'));
     }
 
     function get() {

@@ -1,64 +1,90 @@
 <?php
 
-function init() {
+class config extends ArrayObject {
+    function __construct() {
+        parent::__construct();
 
-    global $config;
+        $config = parse_ini_file('filestorage.ini', true, INI_SCANNER_RAW);
 
-    $config = parse_ini_file('filestorage.ini', true, INI_SCANNER_RAW);
+        if (!$config)
+            throw new Exception('Cannot read or parse "filestorage.ini"');
 
-    if ($config['node']['hashalgo'] != 'md5' && $config['node']['hashalgo'] != 'sha256')
-        throw new Exception('Hash algorithm "' . $config['node']['hashalgo'] . '" not supported');
+        if ($config['node']['hashalgo'] != 'md5' && $config['node']['hashalgo'] != 'sha256')
+            throw new Exception('Hash algorithm "' . $config['node']['hashalgo'] . '" not supported');
+
+        $this->exchangeArray($config);
+
+    }
+
+    function __destruct() {
+        parent::__destruct();
+    }
 }
 
-function mq_init() {
+class queue {
+    private $amqp_conn;
+    private $amqp_pub;
+    private $amqp_sub;
+    private $hostname;
+    private $queuename;
 
-    global $amqp_conn;
-    global $config;
+    function __construct(&$config, $queuename = false) {
 
-    $amqp_conn = new AMQPConnection();
+        $this->hostname = $config['node']['hostname'];
+        $this->queuename = $queuename ? $queuename : 'filestorage.replica.' . $this->hostname;
 
-    $amqp_conn->setHost($config['amqp']['host']);
-    $amqp_conn->setPort($config['amqp']['port']);
-    $amqp_conn->setLogin($config['amqp']['user']);
-    $amqp_conn->setPassword($config['amqp']['pass']);
-    $amqp_conn->setVhost($config['amqp']['vhost']);
-    if (!$amqp_conn->connect()) throw new Exception('Could not connect to AMQP broker');
-}
+        $this->amqp_conn = new AMQPConnection();
 
-function mq_init_pub() {
+        $this->amqp_conn->setHost($config['amqp']['host']);
+        $this->amqp_conn->setPort($config['amqp']['port']);
+        $this->amqp_conn->setLogin($config['amqp']['user']);
+        $this->amqp_conn->setPassword($config['amqp']['pass']);
+        $this->amqp_conn->setVhost($config['amqp']['vhost']);
+        if (!$this->amqp_conn->connect())
+            throw new Exception('Could not connect to AMQP broker');
+    }
 
-    global $amqp_pub;
-    global $amqp_conn;
+    function _init_pub() {
 
-    $amqp_pub = new AMQPExchange(new AMQPChannel($amqp_conn));
-    $amqp_pub->SetName('filestorage');
-}
+        $this->amqp_pub = new AMQPExchange(new AMQPChannel($amqp_conn));
+        $this->amqp_pub->SetName('filestorage');
+    }
 
-function mq_init_sub() {
+    function _init_sub() {
 
-    global $amqp_sub;
-    global $amqp_conn;
-    global $config;
+        $this->amqp_sub = new AMQPQueue(new AMQPChannel($amqp_conn));
+        $this->amqp_sub->SetName($this->queuename);
+    }
 
-    $amqp_sub = new AMQPQueue(new AMQPChannel($amqp_conn));
-    $amqp_sub->SetName('filestorage.replica.' . $config['node']['hostname']);
-}
+    function _enqueue($message, $headers) {
+        if (!$this->amqp_pub)
+            $this->_init_pub();
 
-function mq_broadcast($message) {
+        return $this->amqp_pub->publish($message, '', 0, array('headers' => array_fill_keys($headers, 'yes')));
+    }
 
-    global $amqp_pub;
-    return $amqp_pub->publish($message, '', 0, array('headers' => array('broadcast' => 'yes')));
-}
+    function broadcast($message) {
 
-function mq_send_to_slaves($message) {
+        return $this->_enqueue($message, array('broadcast'));
+    }
 
-    global $amqp_pub;
-    global $config;
+    function multicast($message) {
 
-    return $amqp_pub->publish($message, '', 0, array('headers' => array(
-                                                                    $config['node']['hostname'] => 'yes',
-                                                                    'log' => 'yes',
-                                                                    'db' => 'yes' )));
+        return $this->_enqueue($message, array($this->hostname, 'log', 'db'));
+    }
+
+    function get() {
+        if (!$this->amqp_sub)
+            $this->_init_sub();
+
+        return $this->amqp_sub->get();
+    }
+
+    function ack(&$message) {
+
+        return $this->amqp_sub->ack($message->getDeliveryTag());
+    }
+
 }
 
 class lock {

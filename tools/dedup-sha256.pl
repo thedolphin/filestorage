@@ -11,6 +11,8 @@ $storage = '/vol/storage';
 $hashstorage = '/vol/storage.sha256';
 
 $|++;
+$< = $> = $( = $) = 80; # uid, eiud, gid, egid => www
+umask(0077); # 0600
 
 sub timedelta {
     $timed = shift;
@@ -25,18 +27,21 @@ sub timedelta {
 sub gethash {
     local $fn = shift;
 
-    if (getfattr($fn, 'md5')) {
-        delfattr($fn, 'md5');
-    }
+    $oldhash = getfattr($fn, 'user.sha256');
+    $newhash = getfattr($fn, 'sha256');
 
-    if ($hash = getfattr($fn, 'user.sha256')) {
-        delfattr($fn, 'user.sha256');
+    delfattr($fn, 'md5') if getfattr($fn, 'md5');
+    delfattr($fn, 'user.sha256') if $oldhash;
+
+    if(!$newhash) {
+        if ($oldhash) {
+            $hash = $oldhash;
+        } else {
+            $hash = digest_file_hex($fn, 'SHA-256');
+        }
         setfattr($fn, 'sha256', $hash);
-        return $hash
-    }
-
-    if(!($hash = getfattr($fn, 'sha256'))) {
-        $hash = digest_file_hex($fn, 'SHA-256');
+    } else {
+        $hash = $newhash;
     }
 
     return $hash;

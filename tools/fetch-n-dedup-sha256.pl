@@ -1,8 +1,6 @@
 #!/usr/bin/perl
 
-
 use Fcntl ':mode';
-#use File::Path;
 use File::Path;
 use File::Basename 'dirname';
 use LWP::UserAgent;
@@ -12,20 +10,13 @@ use File::ExtAttr ':all';
 
 #use strict;
 
-my $storage = '/vol/storage';
-my $hashstorage = '/vol/storage.sha256';
+my $storage = '/vol/filestorage-v3';
+my $hashstorage = '/vol/filestorage-v3.hash';
+my $srchost = 'http://10.1.0.19';
 
 $|++;
-
-sub gethash {
-    local $fn = shift;
-    $hash = getfattr($fn, 'user.sha256');
-    if ( ! $hash ) {
-        $hash = digest_file_hex($fn, 'SHA-256');
-        setfattr($fn, 'user.sha256', $hash);
-    }
-    return $hash;
-}
+$< = $> = $( = $) = 80; # uid, eiud, gid, egid => www
+umask(0077); # 0600
 
 while(<>) {
     chomp;
@@ -34,9 +25,9 @@ while(<>) {
     next if /meta\.json$/;
 
     ($d) = m|([0-9a-z]{2}/[0-9a-z]{2}/[0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}\..+)|;
-    print "$d";
 
     next if not $d;
+    print "$d";
 
     if ( -s "$storage/$d" ) {
         print ": exists, skipping\n";
@@ -44,7 +35,7 @@ while(<>) {
     }
 
     my $ua = LWP::UserAgent->new;
-    my $req = HTTP::Request->new(GET => 'http://10.1.0.23/' . $d);
+    my $req = HTTP::Request->new(GET => $srchost .'/'. $d);
     my $res = $ua->request($req);
 
     if (!$res->is_success) {
@@ -60,22 +51,17 @@ while(<>) {
 
     print " -> $hashpath: ";
 
-
     if ( -f $hashpath) {
         print "dup\n";
     } else {
         print "new\n";
         mkpath(dirname("$hashpath"));
         open($fh, ">$hashpath"); print $fh $data; close($fh);
-        setfattr($hashpath, 'user.sha256', $hash);
+        setfattr($hashpath, 'sha256', $hash);
     }
 
     $realpath = $storage .'/'. $d;
-#    if ( -f $realpath ) {
-#        unlink $realpath;
-#    } else {
-        mkpath(dirname($realpath));
-#    }
+    mkpath(dirname($realpath));
 
     link $hashpath, $realpath;
 }

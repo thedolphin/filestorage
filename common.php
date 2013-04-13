@@ -88,9 +88,7 @@ class lock {
     private $filehandler;
     private $filename;
 
-    function __construct($name) {
-
-        global $config;
+    function __construct(&$config, $name) {
 
         $this->filename = $config['node']['lockdir'] .'/'. $name . '.lock';
         $this->filehandler = fopen($this->filename, 'c');

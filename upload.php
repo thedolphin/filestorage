@@ -69,7 +69,7 @@
 
                 $new_hash = false;
 
-                $lock = new lock($hash);
+                $lock = new lock($config, $hash);
 
                 try {
 
@@ -80,11 +80,11 @@
                         compatibility:
                         we may have old version hash storage
                         with different hash attributes
-                        */
 
                         if (!xattr_get($hash_path, $config['node']['hashalgo']))
                             if (!xattr_set($hash_path, $config['node']['hashalgo'], $hash))
                                 throw new Exception("Could not set attribute on '". $hash_path ."'");
+                        */
 
                     } else {
                         if (!(is_dir($hash_dir) || mkdir ($hash_dir, 0755, true)))
@@ -135,8 +135,6 @@
             catch (Exception $exception) {
                 $result[$fileindex] = array('FAIL' => $exception->getMessage());
             }
-
-            unset($lock);
         }
 
         header('HTTP/1.1 200 Ok');

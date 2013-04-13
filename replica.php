@@ -26,7 +26,7 @@ try {
             $hash_dir = $config['node']['hashstorage'] .'/'. $hash_prefix;
             $hash_path = $hash_dir .'/'. $hash;
 
-            $lock = new lock($hash);
+            $lock = new lock($config, $hash);
 
             try {
 
@@ -35,11 +35,11 @@ try {
                     compatibility:
                     we may have old version hash storage
                     with different hash attributes
-                    */
 
                     if (!xattr_get($hash_path, $config['node']['hashalgo']))
                         if (!xattr_set($hash_path, $config['node']['hashalgo'], $hash))
                             throw new Exception("Could not set attribute on '". $hash_path ."'");
+                    */
 
                 } else {
                     if (!(is_dir($hash_dir) || mkdir ($hash_dir, 0755, true)))
@@ -106,7 +106,7 @@ try {
 
                     if ($hash = xattr_get($link_path, $config['node']['hashalgo'])) {
 
-                        $lock = new lock($hash);
+                        $lock = new lock($config, $hash);
 
                         $hash_prefix = substr($hash, 0, 2) .'/'. substr($hash, 2, 2) .'/'. substr($hash, 4, 2);
                         $hash_file = $hash;

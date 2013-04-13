@@ -46,13 +46,13 @@ class queue {
 
     function _init_pub() {
 
-        $this->amqp_pub = new AMQPExchange(new AMQPChannel($amqp_conn));
+        $this->amqp_pub = new AMQPExchange(new AMQPChannel($this->amqp_conn));
         $this->amqp_pub->SetName('filestorage');
     }
 
     function _init_sub() {
 
-        $this->amqp_sub = new AMQPQueue(new AMQPChannel($amqp_conn));
+        $this->amqp_sub = new AMQPQueue(new AMQPChannel($this->amqp_conn));
         $this->amqp_sub->SetName($this->queuename);
     }
 

@@ -15,10 +15,6 @@ class config extends ArrayObject {
         $this->exchangeArray($config);
 
     }
-
-    function __destruct() {
-        parent::__destruct();
-    }
 }
 
 class queue {

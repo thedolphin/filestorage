@@ -6,8 +6,11 @@
         $config = new config();
         $queue = new queue($config, 'filestorage.dbwriter');
 
-        if(!$db = mysql_connect ($config['db']['host'], $config['db']['user'], $config['db']['pass'])) throw new Exception("Cannot connect to mysql");
-        if(!mysql_select_db($config['db']['db'], $db)) throw new Exception("Cannot connect to database");
+        if(!$db = mysql_connect ($config['db']['host'], $config['db']['user'], $config['db']['pass']))
+            throw new Exception("Cannot connect to mysql");
+
+        if(!mysql_select_db($config['db']['db'], $db))
+            throw new Exception("Cannot connect to database");
 
         while($message = $queue->get()) {
 
@@ -20,7 +23,12 @@
             $groupindex = $data['group'];
             $time = $data['time'];
 
-            if (!mysql_query("BEGIN")) throw new Exception("Lack of transaction support detected");
+            if (isset($config['db']['skiplog']) && $config['db']['skiplog'] == 'yes')
+                if (!mysql_query("SET sql_log_bin = 0"))
+                    throw new Exception('Could not disable mysql binary logging: ' . mysql_error ($db));
+
+            if (!mysql_query("BEGIN"))
+                throw new Exception("Lack of transaction support detected");
 
             try {
 

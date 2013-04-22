@@ -50,6 +50,10 @@ db=filestorage
 ; whether delete records permanently or mark as deleted only
 delete=yes
 
+; optional, whether to disable binary logging on database operations
+; database user must have 'super' privilege
+skiplog=yes
+
 ; logwriter module only, may be safely removed if logwriter module not used locally
 [log]
 commit=/vol/filestorage.log

@@ -53,7 +53,7 @@
                             throw new Exception("Cannot delete file with UUID $uuid: " . mysql_error ($db));
 
                         if(!mysql_query("DELETE IGNORE FROM attributes WHERE `uuid` = UNHEX('". $uuid ."')"))
-                            throw new Exception("Cannot attributes with UUID $uuid into table files: " . mysql_error ($db));
+                            throw new Exception("Cannot delete attributes with UUID $uuid: " . mysql_error ($db));
                     }
                 }
 

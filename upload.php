@@ -77,7 +77,8 @@
                 try {
 
                     if (file_exists($hash_path)) {
-                        unlink($filedata['spec']['source']);
+                        if(!unlink($filedata['spec']['source']))
+                            throw new Exception('cannot unlink source file, possible client timed out');
 
                         /*
                         compatibility:

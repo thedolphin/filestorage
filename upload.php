@@ -115,7 +115,9 @@
                             'prefix' => $config['node']['hostprefix'],
                             'clientip' => $client,
                             'meta' => $filedata['meta'],
-                            'spec' => $filedata['spec'])));
+                            'spec' => array(
+                                'size' => $filedata['spec']['size'],
+                                $config['node']['hashalgo'] => $hash))));
                 }
 
                 catch(Exception $exception) {

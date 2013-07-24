@@ -41,13 +41,16 @@
                 if (!isset($filedata['meta']['Filename']))  throw new Exception('no Filename value');
                 if (!isset($filedata['meta']['Extension'])) throw new Exception('no Extension value');
                 if (!isset($filedata['meta']['UUID']))      throw new Exception('no UUID value');
-                if (!preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/', $filedata['meta']['UUID']))
-                                                    throw new Exception('invalid UUID value');
                 if (!isset($filedata['spec']['source']))    throw new Exception('no Source value - possible nginx misconfiguration');
                 if (!isset($filedata['spec']['size']))      throw new Exception('no Size value - possible nginx misconfiguration');
                 if (!isset($filedata['spec']['md5']))       throw new Exception('no MD5 value - possible nginx misconfiguration');
                 if (!isset($filedata['spec']['sha256']))    throw new Exception('no SHA256 value - possible nginx misconfiguration');
 
+                if (!preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/', $filedata['meta']['UUID']))
+                    throw new Exception('invalid UUID value');
+
+                if (!file_exists($filedata['spec']['source']))
+                    throw new Exception('source file does not exist, possible client timed out');
 
                 $filedata['meta']['Filename'] = trim($filedata['meta']['Filename']);
                 if (!$filedata['meta']['Filename'])         throw new Exception('empty Filename value');

@@ -31,6 +31,7 @@ lockdir=/dev/shm
 ; comma-separated node distinguishers, from which files must be replicated
 ; special word 'none' means no replication used
 parents=img01-2
+maxrequests=1000
 
 ; AMQP broker client configuration
 [amqp]

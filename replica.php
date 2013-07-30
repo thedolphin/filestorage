@@ -6,7 +6,18 @@ try {
     $config = new config();
     $queue = new queue($config);
 
-    while($message = $queue->get()) {
+    $requests = $config['replica']['maxrequests'];
+
+    while($requests > 0) {
+
+        $message = $queue->get();
+
+        if ($message === FALSE) {
+            sleep(1);
+            continue;
+        }
+
+        $requests--;
 
         $data = unserialize($message->getBody());
 

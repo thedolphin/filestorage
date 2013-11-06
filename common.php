@@ -90,7 +90,10 @@ class lock {
 
     function __construct(&$config, $name) {
 
-        $this->filename = $config['node']['lockdir'] .'/'. $name . '.lock';
+# Quick and dirty hack
+#        $this->filename = $config['node']['lockdir'] .'/'. $name . '.lock';
+
+        $fils->filename = $config['node']['lockdir'] . '/filestorage.lock';
         $this->filehandler = fopen($this->filename, 'c');
 
         if (!$this->filehandler)
@@ -101,7 +104,11 @@ class lock {
     }
 
     function __destruct() {
+
+        flock($this->filehandler, LOCK_UN);
         fclose($this->filehandler);
-        unlink($this->filename);
+
+# Quick and dirty hack
+#        unlink($this->filename);
     }
 }

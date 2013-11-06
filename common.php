@@ -93,7 +93,7 @@ class lock {
 # Quick and dirty hack
 #        $this->filename = $config['node']['lockdir'] .'/'. $name . '.lock';
 
-        $fils->filename = $config['node']['lockdir'] . '/filestorage.lock';
+        $this->filename = $config['node']['lockdir'] . '/filestorage.lock';
         $this->filehandler = fopen($this->filename, 'c');
 
         if (!$this->filehandler)

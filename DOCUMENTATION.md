@@ -295,7 +295,9 @@ service runsvdir start
 #!/bin/sh
 tunedev() {
   echo deadline > /sys/block/$1/queue/scheduler
-  echo 150 > /sys/block/$1/queue/iosched/read_expire echo 500 > /sys/block/$1/queue/iosched/write_expire echo 0 > /sys/block/$1/queue/iosched/front_merges
+  echo 150 > /sys/block/$1/queue/iosched/read_expire
+  echo 500 > /sys/block/$1/queue/iosched/write_expire
+  echo 0 > /sys/block/$1/queue/iosched/front_merges
 }
 
 tunecache() {
